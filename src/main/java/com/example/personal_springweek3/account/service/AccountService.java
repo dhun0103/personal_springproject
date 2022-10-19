@@ -29,23 +29,30 @@ public class AccountService {
 
     @Transactional
     public GlobalResponseDto signup(AccountRequestDto accountRequestDto) {
-        // email 중복 검사
-        if(accountRepository.findByEmail(accountRequestDto.getEmail()).isPresent()){
+        // nickname 중복 검사
+        if(accountRepository.findByNickname(accountRequestDto.getNickname()).isPresent()){
             throw new RuntimeException("Overlap Check");
         }
 
+        // 비밀번호 일치 확인
+        String password = accountRequestDto.getPassword();
+        if(!password.equals(accountRequestDto.getPasswordConfirm())){
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
 
+        // 비밀번호 암호화해서 저장(법으로 정해져 있음)
         accountRequestDto.setEncodePwd(passwordEncoder.encode(accountRequestDto.getPassword()));
-        Account account = new Account(accountRequestDto);
 
+        Account account = new Account(accountRequestDto);
         accountRepository.save(account);
+
         return new GlobalResponseDto("Success signup", HttpStatus.OK.value());
     }
 
     @Transactional
     public GlobalResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
 
-        Account account = accountRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(
+        Account account = accountRepository.findByNickname(loginRequestDto.getNickname()).orElseThrow(
                 () -> new RuntimeException("Not found Account")
         );
         //비밀번호 맞는지 확인
@@ -53,16 +60,16 @@ public class AccountService {
             throw new RuntimeException("Not matches Password");
         }
         //토큰 발급해주기
-        TokenDto tokenDto = jwtUtil.createAllToken(loginRequestDto.getEmail());
+        TokenDto tokenDto = jwtUtil.createAllToken(loginRequestDto.getNickname());
 
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountEmail(loginRequestDto.getEmail());
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountNickname(loginRequestDto.getNickname());
 
         if(refreshToken.isPresent()) {//로그아웃한 후 로그인을 다시하는건가
             RefreshToken refreshToken1 = refreshToken.get().updateToken(tokenDto.getRefreshToken());
             refreshTokenRepository.save(refreshToken1);
 
         }else {
-            RefreshToken newToken = new RefreshToken(tokenDto.getRefreshToken(), loginRequestDto.getEmail());
+            RefreshToken newToken = new RefreshToken(tokenDto.getRefreshToken(), loginRequestDto.getNickname());
             refreshTokenRepository.save(newToken);
         }
         //토큰 header에 넣어줘서 클라이언트에 전달하기

@@ -19,7 +19,6 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final PostRepository postRepository;
 
     //글 작성하기
     @PostMapping("/create/posts")

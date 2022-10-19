@@ -37,6 +37,7 @@ public class LikeService
             // 게시글의 좋아요 수 변경
             List<Like> likes = post.getLikes();
             post.updateLikeCount(likes.size());
+//            post.updateLikeCount(likeRepository.findAllByPostId(likeRequestDto.getPostId()).size());
 
             return false;
         } else {

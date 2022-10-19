@@ -2,21 +2,18 @@ package com.example.personal_springweek3.account.service;
 
 import com.example.personal_springweek3.account.dto.request.PostRequestDto;
 import com.example.personal_springweek3.account.dto.response.PostResponseDto;
-import com.example.personal_springweek3.account.entity.Account;
 import com.example.personal_springweek3.account.entity.Like;
 import com.example.personal_springweek3.account.entity.Post;
 import com.example.personal_springweek3.account.repository.LikeRepository;
 import com.example.personal_springweek3.account.repository.PostRepository;
 import com.example.personal_springweek3.global.dto.GlobalResponseDto;
 import com.example.personal_springweek3.jwt.util.JwtUtil;
-import com.example.personal_springweek3.security.user.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,9 +27,9 @@ public class PostService {
     @Transactional
     public GlobalResponseDto createPost(PostRequestDto postRequestDto, @RequestHeader("ACCESS_TOKEN") String token) {
 
-        String email = jwtUtil.getEmailFromToken(token);
+        String nickname = jwtUtil.getNicknameFromToken(token);
 
-        postRepository.save(new Post(postRequestDto, email));
+        postRepository.save(new Post(postRequestDto, nickname));
 
         return new GlobalResponseDto("Success Save Post", HttpStatus.OK.value());
     }
@@ -49,6 +46,10 @@ public class PostService {
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
+//        // 게시글의 좋아요 수 확인
+//        List<Like> likes = post.getLikes();
+//        post.updateLikeCount(likes.size());
+
         return new PostResponseDto(post);
     }
 
@@ -58,9 +59,9 @@ public class PostService {
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
-        String email = jwtUtil.getEmailFromToken(token);
+        String nickname = jwtUtil.getNicknameFromToken(token);
 
-        if(!email.equals(post.getUserEmail())){
+        if(!nickname.equals(post.getAuthor())){
             throw new RuntimeException("Account Check");
         }
 
@@ -75,9 +76,9 @@ public class PostService {
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
-        String email = jwtUtil.getEmailFromToken(token);
+        String nickname = jwtUtil.getNicknameFromToken(token);
 
-        if(!email.equals(post.getUserEmail())){
+        if(!nickname.equals(post.getAuthor())){
             throw new RuntimeException("Account Check");
         }
 

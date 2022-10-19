@@ -53,18 +53,18 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public TokenDto createAllToken(String email) {
-        return new TokenDto(createToken(email, "Access"), createToken(email, "Refresh"));
+    public TokenDto createAllToken(String nickname) {
+        return new TokenDto(createToken(nickname, "Access"), createToken(nickname, "Refresh"));
     }
 
-    public String createToken(String email, String type) {
+    public String createToken(String nickname, String type) {
 
         Date date = new Date();
 
         long time = type.equals("Access") ? ACCESS_TIME : REFRESH_TIME;
 
         return Jwts.builder()
-                .setSubject(email) //token에 email에 대한 정보 넣어주기
+                .setSubject(nickname) //token에 nickname에 대한 정보 넣어주기
                 .setExpiration(new Date(date.getTime() + time))
                 .setIssuedAt(date)
                 .signWith(key, signatureAlgorithm)
@@ -90,19 +90,19 @@ public class JwtUtil {
         if(!tokenValidation(token)) return false;
 
         // DB에 저장한 토큰 비교
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountEmail(getEmailFromToken(token));
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findByAccountNickname(getNicknameFromToken(token));
 
         return refreshToken.isPresent() && token.equals(refreshToken.get().getRefreshToken());
     }
 
     // 인증 객체 생성
-    public Authentication createAuthentication(String email) { //userDetails에 email 정보 넣어주기
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    public Authentication createAuthentication(String nickname) { //userDetails에 nickname 정보 넣어주기
+        UserDetails userDetails = userDetailsService.loadUserByUsername(nickname);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    // 토큰에서 email 가져오는 기능
-    public String getEmailFromToken(String token) {
+    // 토큰에서 nickname 가져오는 기능
+    public String getNicknameFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
     }
 

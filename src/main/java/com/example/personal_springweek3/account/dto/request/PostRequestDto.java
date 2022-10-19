@@ -17,5 +17,4 @@ public class PostRequestDto {
     @NotBlank
     private String contents;
 
-    private String userEmail;
 }

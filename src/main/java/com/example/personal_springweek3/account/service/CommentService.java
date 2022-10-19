@@ -31,9 +31,9 @@ public class CommentService {
                 new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
-        String email = jwtUtil.getEmailFromToken(token);
+        String nickname = jwtUtil.getNicknameFromToken(token);
 
-        Comment comment = new Comment(commentRequestDto, post, email);
+        Comment comment = new Comment(commentRequestDto, post, nickname);
         commentRepository.save(comment);
 
         return new GlobalResponseDto("Success Save Comment", HttpStatus.OK.value());
@@ -56,9 +56,9 @@ public class CommentService {
                 () -> new IllegalArgumentException("댓글을 찾을 수 없습니다.")
         );
 
-        String email = jwtUtil.getEmailFromToken(token);
+        String nickname = jwtUtil.getNicknameFromToken(token);
 
-        if(!email.equals(comment.getUserEmail())){
+        if(!nickname.equals(comment.getAuthor())){
             throw new RuntimeException("Account Check");
         }
 
@@ -73,9 +73,9 @@ public class CommentService {
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
-        String email = jwtUtil.getEmailFromToken(token);
+        String nickname = jwtUtil.getNicknameFromToken(token);
 
-        if(!email.equals(comment.getUserEmail())){
+        if(!nickname.equals(comment.getAuthor())){
             throw new RuntimeException("Account Check");
         }
 

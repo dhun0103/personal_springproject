@@ -21,17 +21,17 @@ public class Comment extends Timestamped{
     private String comments;
 
     @Column(nullable = false)
-    private String userEmail;
+    private String author;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
     @JsonIgnore
     private Post post;
 
-    public Comment(CommentRequestDto commentRequestDto, Post post, String userEmail) {
+    public Comment(CommentRequestDto commentRequestDto, Post post, String nickname) {
         this.comments = commentRequestDto.getComments();
         this.post = post;
-        this.userEmail=userEmail;
+        this.author =nickname;
     }
 
     public void update(CommentRequestDto commentRequestDto) {
