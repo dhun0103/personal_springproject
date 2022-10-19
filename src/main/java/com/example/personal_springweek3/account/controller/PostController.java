@@ -6,7 +6,9 @@ import com.example.personal_springweek3.account.entity.Post;
 import com.example.personal_springweek3.account.repository.PostRepository;
 import com.example.personal_springweek3.account.service.PostService;
 import com.example.personal_springweek3.global.dto.GlobalResponseDto;
+import com.example.personal_springweek3.security.user.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,13 +32,13 @@ public class PostController {
     @GetMapping("/read/posts")
     public List<Post> readAllPost(){
 
-        return postRepository.findAll();
+        return postService.findAllPost();
     }
     //글 각각 조회하기
     @GetMapping("/read/posts/{postId}")
     public PostResponseDto readOnePost(@PathVariable Long postId) {
 
-        return postService.findDetail(postId);
+        return postService.findOnePost(postId);
     }
 
     //글 수정하기

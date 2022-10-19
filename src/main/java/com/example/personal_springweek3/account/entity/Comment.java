@@ -14,7 +14,7 @@ public class Comment extends Timestamped{
 
     @Id
     @GeneratedValue
-    @Column(name = "commentId")
+    @Column(name = "comment_id")
     private Long id;
 
     @Column(nullable = false)
@@ -24,7 +24,7 @@ public class Comment extends Timestamped{
     private String userEmail;
 
     @ManyToOne
-    @JoinColumn(name = "postid")
+    @JoinColumn(name = "post_id")
     @JsonIgnore
     private Post post;
 
@@ -35,6 +35,7 @@ public class Comment extends Timestamped{
     }
 
     public void update(CommentRequestDto commentRequestDto) {
+
         this.comments = commentRequestDto.getComments();
     }
 }
