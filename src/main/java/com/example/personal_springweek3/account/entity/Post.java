@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +20,13 @@ public class Post extends Timestamped {
     @Column(name = "post_id")
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank
     private String title;
 
-    @Column(nullable = false)
+    @NotBlank
     private String contents;
 
-    @Column(nullable = false)
+    @NotBlank
     private String author;
 
     //FetchType.EAGER는 기본이고 즉시로딩을 의미, CascadeType.REMOVE는 글 삭제시 댓글도 삭제
@@ -33,7 +34,7 @@ public class Post extends Timestamped {
     @OrderBy("id asc") // 댓글 정렬
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Like> likes = new ArrayList<>();
 
     private int likeCount;

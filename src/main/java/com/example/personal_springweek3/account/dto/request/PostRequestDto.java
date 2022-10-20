@@ -11,10 +11,10 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class PostRequestDto {
 
-    @NotBlank
+    @NotBlank(message = "제목은 공백일 수 없습니다.")
     private String title;
 
-    @NotBlank
+    @NotBlank(message = "내용은 공백일 수 없습니다.")
     private String contents;
 
 }

@@ -34,19 +34,12 @@ public class LikeService
         if (foundLike.isPresent()) {
             likeRepository.delete(foundLike.get());
 
-            // 게시글의 좋아요 수 변경
-            List<Like> likes = post.getLikes();
-            post.updateLikeCount(likes.size());
 //            post.updateLikeCount(likeRepository.findAllByPostId(likeRequestDto.getPostId()).size());
 
             return false;
         } else {
             Like like = new Like(account, post);
             likeRepository.save(like);
-
-            // 게시글의 좋아요 수 변경
-            List<Like> likes = post.getLikes();
-            post.updateLikeCount(likes.size());
 
             return true;
         }

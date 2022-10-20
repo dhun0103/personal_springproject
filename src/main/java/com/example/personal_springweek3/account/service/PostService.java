@@ -34,6 +34,7 @@ public class PostService {
         return new GlobalResponseDto("Success Save Post", HttpStatus.OK.value());
     }
 
+    @Transactional
     public List<Post> findAllPost() {
 
         return postRepository.findAll();
@@ -46,9 +47,9 @@ public class PostService {
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
-//        // 게시글의 좋아요 수 확인
-//        List<Like> likes = post.getLikes();
-//        post.updateLikeCount(likes.size());
+        // 게시글의 좋아요 수 확인
+        List<Like> likes = post.getLikes();
+        post.updateLikeCount(likes.size());
 
         return new PostResponseDto(post);
     }
