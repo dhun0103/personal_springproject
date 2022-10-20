@@ -44,7 +44,21 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto findDetail(Long commentId) {
+    public List<CommentResponseDto> findAllComment() {
+        List<Comment> foundCommnets = commentRepository.findAll();
+        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
+
+
+        for (Comment fountComment  : foundCommnets) {
+
+            commentResponseDtos.add(new CommentResponseDto(fountComment));
+        }
+
+        return commentResponseDtos;
+    }
+
+    @Transactional
+    public CommentResponseDto findOneComment(Long commentId) {
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("댓글을 찾을 수 없습니다.")

@@ -3,8 +3,10 @@ package com.example.personal_springweek3.account.service;
 import com.example.personal_springweek3.account.dto.request.PostRequestDto;
 import com.example.personal_springweek3.account.dto.response.PostResponseDto;
 import com.example.personal_springweek3.account.entity.Account;
+import com.example.personal_springweek3.account.entity.Comment;
 import com.example.personal_springweek3.account.entity.Like;
 import com.example.personal_springweek3.account.entity.Post;
+import com.example.personal_springweek3.account.repository.CommentRepository;
 import com.example.personal_springweek3.account.repository.LikeRepository;
 import com.example.personal_springweek3.account.repository.PostRepository;
 import com.example.personal_springweek3.global.dto.GlobalResponseDto;
@@ -26,6 +28,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final JwtUtil jwtUtil;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public GlobalResponseDto createPost(PostRequestDto postRequestDto, @RequestHeader("ACCESS_TOKEN") String token) {
@@ -38,9 +41,21 @@ public class PostService {
     }
 
     @Transactional
-    public List<Post> findAllPost() {
+    public List<PostResponseDto> findAllPost() {
 
-        return postRepository.findAll();
+        List<Post> foundPosts = postRepository.findAll();
+        List<PostResponseDto> postResponseDtos = new ArrayList<>();
+
+        for (Post post : foundPosts) {
+
+            Optional<Comment> foundCommnets = commentRepository.findByPost(post);
+
+            PostResponseDto postResponseDto = new PostResponseDto(post, foundCommnets);
+            postResponseDtos.add(postResponseDto);
+        }
+
+
+        return postResponseDtos;
     }
 
     @Transactional
@@ -50,7 +65,9 @@ public class PostService {
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
 
-        return new PostResponseDto(post);
+        Optional<Comment> foundCommnets = commentRepository.findByPost(post);
+
+        return new PostResponseDto(post, foundCommnets);
     }
 
     @Transactional
@@ -61,7 +78,7 @@ public class PostService {
 
         String nickname = jwtUtil.getNicknameFromToken(token);
 
-        if(!nickname.equals(post.getAuthor())){
+        if (!nickname.equals(post.getAuthor())) {
             throw new RuntimeException("Account Check");
         }
 
@@ -78,7 +95,7 @@ public class PostService {
 
         String nickname = jwtUtil.getNicknameFromToken(token);
 
-        if(!nickname.equals(post.getAuthor())){
+        if (!nickname.equals(post.getAuthor())) {
             throw new RuntimeException("Account Check");
         }
 
@@ -97,9 +114,11 @@ public class PostService {
         String nickname = jwtUtil.getNicknameFromToken(token);
 
         for (Post foundPost : foundPosts) {
-            if(nickname.equals(foundPost.getAuthor())){
+            if (nickname.equals(foundPost.getAuthor())) {
 
-                postResponseDtos.add(new PostResponseDto(foundPost));
+                Optional<Comment> foundCommnets = commentRepository.findByPost(foundPost);
+
+                postResponseDtos.add(new PostResponseDto(foundPost, foundCommnets));
             }
         }
 
@@ -118,9 +137,11 @@ public class PostService {
         for (Post foundPost : foundPosts) {
             Optional<Like> foundLike = likeRepository.findByPostAndAccount(foundPost, account);
 
-            if(foundLike.isPresent()){
+            if (foundLike.isPresent()) {
 
-                postResponseDtos.add(new PostResponseDto(foundPost));
+                Optional<Comment> foundCommnets = commentRepository.findByPost(foundPost);
+
+                postResponseDtos.add(new PostResponseDto(foundPost, foundCommnets));
             }
         }
 

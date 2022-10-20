@@ -30,7 +30,7 @@ public class PostController {
 
     //글 전체 조회하기
     @GetMapping("/read/posts")
-    public List<Post> readAllPost(){
+    public List<PostResponseDto> readAllPost(){
 
         return postService.findAllPost();
     }

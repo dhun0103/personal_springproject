@@ -29,15 +29,15 @@ public class CommentController {
 
     //댓글 전체 조회하기
     @GetMapping("/read/comments")
-    public List<Comment> findAllComment() {
+    public List<CommentResponseDto> findAllComment() {
 
-        return commentRepository.findAll();
+        return commentService.findAllComment();
     }
     //댓글 각각 조회하기
     @GetMapping("/read/comments/{commentId}")
     public CommentResponseDto findOneComment(@PathVariable Long commentId) {
 
-        return commentService.findDetail(commentId);
+        return commentService.findOneComment(commentId);
     }
 
     //댓글 수정하기
