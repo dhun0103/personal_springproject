@@ -53,4 +53,11 @@ public class CommentController {
 
         return commentService.deleteComment(commentId, token);
     }
+
+    //내가 작성한 댓글 조회하기
+    @GetMapping("/read/comments/mycomments")
+    public List<CommentResponseDto> findOneComment( @RequestHeader("ACCESS_TOKEN") String token) {
+
+        return commentService.findMyCreateComment(token);
+    }
 }

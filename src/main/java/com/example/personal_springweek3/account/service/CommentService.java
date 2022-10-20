@@ -2,7 +2,9 @@ package com.example.personal_springweek3.account.service;
 
 import com.example.personal_springweek3.account.dto.request.CommentRequestDto;
 import com.example.personal_springweek3.account.dto.response.CommentResponseDto;
+import com.example.personal_springweek3.account.dto.response.PostResponseDto;
 import com.example.personal_springweek3.account.entity.Comment;
+import com.example.personal_springweek3.account.entity.Like;
 import com.example.personal_springweek3.account.entity.Post;
 import com.example.personal_springweek3.account.repository.CommentRepository;
 import com.example.personal_springweek3.account.repository.PostRepository;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -82,5 +86,25 @@ public class CommentService {
         commentRepository.deleteById(commentId);
 
         return new GlobalResponseDto("Success Delete Comment", HttpStatus.OK.value());
+    }
+
+    //내가 작성한 댓글 조회하기
+    @Transactional
+    public List<CommentResponseDto> findMyCreateComment(@RequestHeader("ACCESS_TOKEN") String token) {
+
+        List<Comment> foundCommnets = commentRepository.findAll();
+        List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
+
+        String nickname = jwtUtil.getNicknameFromToken(token);
+
+        for (Comment fountComment  : foundCommnets) {
+            if(nickname.equals(fountComment.getAuthor())){
+
+                commentResponseDtos.add(new CommentResponseDto(fountComment));
+            }
+        }
+
+        return commentResponseDtos;
+
     }
 }

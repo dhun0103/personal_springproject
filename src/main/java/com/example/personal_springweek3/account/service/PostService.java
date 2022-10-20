@@ -2,6 +2,7 @@ package com.example.personal_springweek3.account.service;
 
 import com.example.personal_springweek3.account.dto.request.PostRequestDto;
 import com.example.personal_springweek3.account.dto.response.PostResponseDto;
+import com.example.personal_springweek3.account.entity.Account;
 import com.example.personal_springweek3.account.entity.Like;
 import com.example.personal_springweek3.account.entity.Post;
 import com.example.personal_springweek3.account.repository.LikeRepository;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +49,6 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new IllegalArgumentException("게시글을 찾을 수 없습니다.")
         );
-
-        // 게시글의 좋아요 수 확인
-        List<Like> likes = post.getLikes();
-        post.updateLikeCount(likes.size());
 
         return new PostResponseDto(post);
     }
@@ -86,5 +85,45 @@ public class PostService {
         postRepository.deleteById(postId);
 
         return new GlobalResponseDto("Success Delete Post", HttpStatus.OK.value());
+    }
+
+    //내가 쓴 글 게시글 조회하기
+    @Transactional
+    public List<PostResponseDto> findMyCreatePost(@RequestHeader("ACCESS_TOKEN") String token) {
+
+        List<Post> foundPosts = postRepository.findAll();
+        List<PostResponseDto> postResponseDtos = new ArrayList<>();
+
+        String nickname = jwtUtil.getNicknameFromToken(token);
+
+        for (Post foundPost : foundPosts) {
+            if(nickname.equals(foundPost.getAuthor())){
+
+                postResponseDtos.add(new PostResponseDto(foundPost));
+            }
+        }
+
+        return postResponseDtos;
+
+    }
+
+    //내가 좋아요한 글 조회하기
+    @Transactional
+    public List<PostResponseDto> findMyLikePost(Account account) {
+
+        List<Post> foundPosts = postRepository.findAll();
+        List<PostResponseDto> postResponseDtos = new ArrayList<>();
+
+
+        for (Post foundPost : foundPosts) {
+            Optional<Like> foundLike = likeRepository.findByPostAndAccount(foundPost, account);
+
+            if(foundLike.isPresent()){
+
+                postResponseDtos.add(new PostResponseDto(foundPost));
+            }
+        }
+
+        return postResponseDtos;
     }
 }

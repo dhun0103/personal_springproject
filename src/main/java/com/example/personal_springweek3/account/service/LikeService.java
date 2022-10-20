@@ -15,8 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class LikeService
-{
+public class LikeService {
     private final PostRepository postRepository;
 
     private final LikeRepository likeRepository;
@@ -31,13 +30,18 @@ public class LikeService
         // 좋아요를 누른 상태인지, 누르지 않은 상태인지 확인
         Optional<Like> foundLike = likeRepository.findByPostAndAccount(post, account);
 
-        if (foundLike.isPresent()) {
-            likeRepository.delete(foundLike.get());
+        // 게시글의 좋아요 수 확인
+        List<Like> likes = post.getLikes();
 
-//            post.updateLikeCount(likeRepository.findAllByPostId(likeRequestDto.getPostId()).size());
+        if (foundLike.isPresent()) {
+            post.updateLikeCount(likes.size() - 1);
+
+            likeRepository.delete(foundLike.get());
 
             return false;
         } else {
+            post.updateLikeCount(likes.size() + 1);
+
             Like like = new Like(account, post);
             likeRepository.save(like);
 
